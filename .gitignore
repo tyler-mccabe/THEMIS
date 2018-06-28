@@ -1,8 +1,10 @@
 # Don't track content in these folders
-07_14_2008/
-08_19_2008/
-09_08_2008/
-09_16_2008/
+07_14_2008/Plots/
+08_19_2008/Plots/
+09_08_2008/Plots/
+09_16_2008/Plots/
 
 # Don't track these files
 *.png
+*.tplot
+*.sav
