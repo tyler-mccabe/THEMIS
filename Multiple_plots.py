@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import scipy
 from scipy import io
 import math as m
+import datetime
 
 ## This code reads in a .tplot file and plots 6 parameters in 6 subplots
 ## Must change date, tplot, indicies of interest, save directory and plot Title
@@ -13,10 +14,10 @@ plt.rcParams['xtick.top'] = True
 plt.rcParams['ytick.right'] = True
 
 path = '/Volumes/Seagate/NASA/Summer2018/THEMIS/'
-date = '08_19_2008/'
-tplot = 'TPLOT_save_file_THC.tplot'
+date = '07_14_2008/'
+tplot = 'TPLOT_save_file_THC_new.tplot'
 savedir = 'Plots/THC/'
-plot_title = 'Themis C: 08-19-2008'
+plot_title = 'Themis C: 07-14-2008'
 
 file = scipy.io.readsav(path+date+tplot,python_dict=True)
 dq = file['dq']
@@ -26,12 +27,12 @@ dh = dq['dh']
 # Indicies of Interest
 ##############
 ## Remember, these are one less than the IDL index
-index1 = 37 ## Magnetic Field Mag      (fgh_mag)
+index1 = 41 ## Magnetic Field Mag      (fgh_mag)
 index2 = 29 ## Magnetic Field Vector   (fgh_gse)
-index3 = 70 ## Electron Density Burst  (peeb_density)
-index4 = 71 ## Electron Temp Burst     (peib_avgtemp)
-index5 = 85 ## Ion Density Burst       (peib_density)
-index6 = 86 ## Ion Temp Burst          (peib_avgtemp)
+index3 = 74 ## Electron Density Burst  (peeb_density)
+index4 = 75 ## Electron Temp Burst     (peib_avgtemp)
+index5 = 89 ## Ion Density Burst       (peib_density)
+index6 = 90 ## Ion Temp Burst          (peib_avgtemp)
 ## Plot fit params later
 
 ##############
@@ -43,7 +44,7 @@ y1 = dh[index1].y[0]
 ##############
 # Magnetic Field Vectors
 ##############
-t2 = dh[index2].x[0] - 1215993600
+t2 = dh[index2].x[0] #- 1215993600
 y2_x = dh[index2].y[0][0] #GSE Coordinates
 y2_y = dh[index2].y[0][1] #GSE Coordinates
 y2_z = dh[index2].y[0][2] #GSE Coordinates
@@ -51,13 +52,13 @@ y2_z = dh[index2].y[0][2] #GSE Coordinates
 ##############
 # Electron Density
 ##############
-t3 = dh[index3].x[0] - 1215993600
+t3 = dh[index3].x[0] #- 1215993600
 y3 = dh[index3].y[0]
 
 ##############
 # Electron Temperature
 ##############
-t4 = dh[index4].x[0] - 1215993600
+t4 = dh[index4].x[0]# - 1215993600
 y4 = dh[index4].y[0]
 
 ##############
@@ -69,7 +70,7 @@ y5 = dh[index5].y[0]
 ##############
 # Ion Temperature
 ##############
-t6 = dh[index6].x[0] - 1215993600
+t6 = dh[index6].x[0] #- 1215993600
 y6 = dh[index6].y[0]
 
 ##############
@@ -99,6 +100,18 @@ if len(min_index1) > len(max_index1):
 ##############
 # Overall Plot Structure
 ##############
+
+def unix_to_utc(unix_time_array):
+    '''Takes array of tick labels in unix time
+    and converts them into readable utc
+    Make sure to import datetime'''
+    result = [None]*(len(unix_time_array))
+    for i in range(len(unix_time_array)):
+        result[i] = datetime.datetime.utcfromtimestamp(unix_time_array[i]
+        ).strftime('%H:%M:%S')
+    print("result type:",type(result))
+    return result
+
 for i in range(6):
 
     print(i)
@@ -155,13 +168,16 @@ for i in range(6):
     ax5.set_ylabel('$n_{i}\ (cm^{-3})$')
     ax5.set_xlim(xmin,xmax)
     ax5.set_ylim(np.nanmin(y5[begin:end])*0.8, np.nanmax(y5[begin:end])*1.1)
-    
+    # ax5.set_xticklabels(unix_to_utc(ax5.get_xticks()))
+
     # ax6.semilogy(t5,y6,'k',lw=0.5)
     ax6.plot(t5,y6,'k',lw=0.5)
     ax6.set_ylabel('$T_{i}$ (eV)')
     ax6.set_xlabel('Time From Start of Date (s)')
     ax6.set_xlim(xmin,xmax)
     ax6.set_ylim(np.nanmin(y6[begin:end])*0.8, np.nanmax(y6[begin:end])*1.1)
+    ax6.set_xticklabels(unix_to_utc(ax6.get_xticks()))
+
     fig.suptitle(plot_title)
     fig.subplots_adjust(left=0.15, bottom=0.1, right=0.97, top=0.94, wspace=0.2, hspace=0.38)
     plt.savefig(path + date + savedir + 'figure_%d.png'%(i+1))
