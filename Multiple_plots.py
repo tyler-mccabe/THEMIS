@@ -94,7 +94,15 @@ if len(min_index1) > len(max_index1):
     max_index1 = np.append(max_index1,len(y1)-1)
 print('min 1 ', min_index1)
 print('max 1 ', max_index1)
-
+print(len(min_index1))
+if len(min_index1) < 1:
+    for i in range(len(t1)-1):
+        if (t1[i+1] - t1[i]) >= 100:
+            min_index1 = np.append(min_index1,i)
+        else:
+            pass
+    print('min_new 1 ', min_index1)
+    print(np.size(min_index1))
 ##############
 # Overall Plot Structure
 ##############
