@@ -21,8 +21,8 @@ plt.rcParams['ytick.direction'] = 'in'
 plt.rcParams['xtick.top'] = True
 plt.rcParams['ytick.right'] = True
 
-path = '/Volumes/Seagate/NASA/Summer2018/THEMIS/'
-date = '08_19_2008/'
+path = '/Users/tylermccabe/Documents/NASA/Summer2018/THEMIS/'
+date = '09_16_2008/'
 tplot = 'TPLOT_save_file_THC.tplot'
 savedir = 'Plots/THC/'
 plot_title = 'Themis C: ' + date[:-1]
@@ -34,13 +34,22 @@ dh = dq['dh']
 ##############
 # Indicies of Interest
 ##############
+
+def get_index(string_handle):
+	for i in range(len(dq)):
+		string = dq[i][0].decode()
+		if string[4:] == string_handle:
+			print(string)
+			index = i
+	return index
+
 ## Remember, these are one less than the IDL index
-index1 = 41 ## Magnetic Field Mag      (fgh_mag)
-index2 = 29 ## Magnetic Field Vector   (fgh_gse)
-index3 = 74 ## Electron Density Burst  (peeb_density)
-index4 = 75 ## Electron Temp Burst     (peib_avgtemp)
-index5 = 89 ## Ion Density Burst       (peib_density)
-index6 = 90 ## Ion Temp Burst          (peib_avgtemp)
+index1 = get_index('fgh_mag')      ## Magnetic Field Mag      (fgh_mag)
+index2 = get_index('fgh_gse')      ## Magnetic Field Vector   (fgh_gse)
+index3 = get_index('peeb_density') ## Electron Density Burst  (peeb_density)
+index4 = get_index('peeb_avgtemp') ## Electron Temp Burst     (peeb_avgtemp)
+index5 = get_index('peib_density') ## Ion Density Burst       (peib_density)
+index6 = get_index('peib_avgtemp') ## Ion Temp Burst          (peib_avgtemp)
 ## Plot fit params later
 
 ##############
@@ -92,17 +101,31 @@ for i in range(len(y1)-1):
         max_index1 = np.append(max_index1,i+1)
 if len(min_index1) > len(max_index1):
     max_index1 = np.append(max_index1,len(y1)-1)
-print('min 1 ', min_index1)
-print('max 1 ', max_index1)
-print(len(min_index1))
+# print('min 1 ', min_index1)
+# print('max 1 ', max_index1)
+# print(len(min_index1))
+for i in range(len(min_index1)):
+	x = int(min_index1[i])
+	y = int(max_index1[i])
+	print(x,y,t1[x]-1.2191e9,t1[y]-1.2191e9)
 if len(min_index1) < 1:
     for i in range(len(t1)-1):
-        if (t1[i+1] - t1[i]) >= 100:
+        if (t1[i+1] - t1[i]) >= 200:
             min_index1 = np.append(min_index1,i)
         else:
             pass
-    print('min_new 1 ', min_index1)
-    print(np.size(min_index1))
+elif len(min_index1) != 6:
+	min_index1 = np.asarray([0])
+	max_index1 = np.asarray([])
+	for i in range(len(t1)-1):
+		if (t1[i+1]-t1[i]) >= 200:
+			min_index1 = np.append(min_index1,i+1)
+			max_index1 = np.append(max_index1,i)
+	max_index1 = np.append(max_index1,len(t1)-1)
+else:
+	pass
+# print('min_new 1 ', min_index1)
+# print(np.size(min_index1))
 ##############
 # Overall Plot Structure
 ##############
@@ -177,7 +200,6 @@ for i in range(6):
     plt.setp(ax3.get_xticklabels(), visible=False) #Share x-axis
 
     begin, end = get_begin_end_indicies(t4, xmin, xmax)
-    # ax4.semilogy(t5,y4,'k',lw=0.5)    
     ax4.plot(t4,y4,'k',lw=0.5)
     ax4.set_ylabel('$T_{e}$ (eV)')
     ax4.set_xlim(xmin,xmax)
