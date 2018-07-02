@@ -8,14 +8,6 @@ import datetime
 ## This code reads in a .tplot file and plots 6 parameters in 6 subplots
 ## Must change date, tplot, indicies of interest, save directory and plot Title
 
-
-'''
-PROGRESS: AT THIS POINT, THE AUGUST 19TH THEMIS FILE DOES NOT HAVE 
-DATA BREAKS SEPARATED BY NANS. NEED TO UPDATE CODE SO THAT IF 
-MIN_INDEX1/MAX_INDEX 1 IS EMPTY, THEN SEPARATE BASED ON A JUMP 
-FORWARD IN TIME. ie: if t[i+1] - t[i] > 100s
-'''
-
 plt.rcParams['xtick.direction'] = 'in'
 plt.rcParams['ytick.direction'] = 'in'
 plt.rcParams['xtick.top'] = True
@@ -43,7 +35,6 @@ def get_index(string_handle):
 			index = i
 	return index
 
-## Remember, these are one less than the IDL index
 index1 = get_index('fgh_mag')      ## Magnetic Field Mag      (fgh_mag)
 index2 = get_index('fgh_gse')      ## Magnetic Field Vector   (fgh_gse)
 index3 = get_index('peeb_density') ## Electron Density Burst  (peeb_density)
@@ -101,9 +92,7 @@ for i in range(len(y1)-1):
         max_index1 = np.append(max_index1,i+1)
 if len(min_index1) > len(max_index1):
     max_index1 = np.append(max_index1,len(y1)-1)
-# print('min 1 ', min_index1)
-# print('max 1 ', max_index1)
-# print(len(min_index1))
+
 for i in range(len(min_index1)):
 	x = int(min_index1[i])
 	y = int(max_index1[i])
@@ -124,8 +113,7 @@ elif len(min_index1) != 6:
 	max_index1 = np.append(max_index1,len(t1)-1)
 else:
 	pass
-# print('min_new 1 ', min_index1)
-# print(np.size(min_index1))
+
 ##############
 # Overall Plot Structure
 ##############
@@ -151,7 +139,7 @@ def get_begin_end_indicies(time_array,start_time,stop_time):
     end_index = list(time_array).index(np.nanmax(time))
     return begin_index,end_index
 
-for i in range(6):
+for i in range(len(min_index1)):
 
     print('Plot ',i+1)
 
@@ -163,10 +151,10 @@ for i in range(6):
     ax5 = fig.add_subplot(6,1,5)
     ax6 = fig.add_subplot(6,1,6)
     
-    start = int(min_index1[i]) #+ 1
-    xmin = t1[start]# - 10 # 3.9
-    stop = int(max_index1[i]) #- 1
-    xmax = t1[stop]# + 10 # 3.9
+    start = int(min_index1[i]) 
+    xmin = t1[start]
+    stop = int(max_index1[i]) 
+    xmax = t1[stop]
 
     begin, end = get_begin_end_indicies(t1, xmin, xmax)
     ax1.plot(t1,y1,'k',lw=0.5)
@@ -205,11 +193,10 @@ for i in range(6):
     ax4.set_xlim(xmin,xmax)
     ax4.set_ylim(np.nanmin(y4[begin:end])*0.8, np.nanmax(y4[begin:end])*1.1)
     diff = np.nanmax(y4[begin:end]) - np.nanmin(y4[begin:end])
-    if diff >= 1000:
+    if diff >= 800:
         ax4.cla()
         ax4.semilogy(t4,y4,'k',lw=0.5)
         ax4.set_ylabel('$T_{i}$ (eV)')
-        ax4.set_xlabel('Time From Start of Date (s)')
         ax4.set_xlim(xmin,xmax)
         ax4.set_ylim(np.nanmin(y4[begin:end])*0.8, np.nanmax(y4[begin:end])*1.1)
     else:
