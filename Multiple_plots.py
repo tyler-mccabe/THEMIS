@@ -6,18 +6,20 @@ import math as m
 import datetime
 
 ## This code reads in a .tplot file and plots 6 parameters in 6 subplots
-## Must change date, tplot, indicies of interest, save directory and plot Title
+## Must change date and themis
 
 plt.rcParams['xtick.direction'] = 'in'
 plt.rcParams['ytick.direction'] = 'in'
 plt.rcParams['xtick.top'] = True
 plt.rcParams['ytick.right'] = True
 
+themis = 'THC'
+
 path = '/Users/tylermccabe/Documents/NASA/Summer2018/THEMIS/'
 date = '09_16_2008/'
-tplot = 'TPLOT_save_file_THC.tplot'
-savedir = 'Plots/THC/'
-plot_title = 'Themis C: ' + date[:-1]
+tplot = themis + '.tplot'
+savedir = 'Plots/' + themis + '/'
+plot_title = themis + ': ' + date[:-1]
 
 file = scipy.io.readsav(path+date+tplot,python_dict=True)
 dq = file['dq']
@@ -145,11 +147,11 @@ for i in range(len(min_index1)):
 
     fig = plt.figure(figsize=(5.5,6.5))
     ax1 = fig.add_subplot(6,1,1)
-    ax2 = fig.add_subplot(6,1,2)
-    ax3 = fig.add_subplot(6,1,3)
-    ax4 = fig.add_subplot(6,1,4)
-    ax5 = fig.add_subplot(6,1,5)
-    ax6 = fig.add_subplot(6,1,6)
+    ax2 = fig.add_subplot(6,1,2,sharex=ax1)
+    ax3 = fig.add_subplot(6,1,3,sharex=ax1)
+    ax4 = fig.add_subplot(6,1,4,sharex=ax1)
+    ax5 = fig.add_subplot(6,1,5,sharex=ax1)
+    ax6 = fig.add_subplot(6,1,6,sharex=ax1)
     
     start = int(min_index1[i]) 
     xmin = t1[start]
@@ -223,7 +225,7 @@ for i in range(len(min_index1)):
         ax6.cla()
         ax6.semilogy(t6,y6,'k',lw=0.5)
         ax6.set_ylabel('$T_{i}$ (eV)')
-        ax6.set_xlabel('Time From Start of Date (s)')
+        ax6.set_xlabel('Time of Day')
         ax6.set_xlim(xmin,xmax)
         ax6.set_ylim(np.nanmin(y6[begin:end])*0.8, np.nanmax(y6[begin:end])*1.1)
     else:
@@ -235,3 +237,4 @@ for i in range(len(min_index1)):
     plt.savefig(path + date + savedir + 'figure_%d.png'%(i+1))
     # plt.show() 
     plt.clf()
+    plt.close()
