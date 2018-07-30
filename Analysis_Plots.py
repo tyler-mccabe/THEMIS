@@ -13,8 +13,8 @@ plt.rcParams['ytick.direction'] = 'in'
 plt.rcParams['xtick.top'] = True
 plt.rcParams['ytick.right'] = True
 
-themis = 'THB'
-slice_by = 'efw' ## Choose variable to create slices by
+themis = 'THC'
+slice_by = 'scw' ## Choose variable to create slices by
 
 path = '/Users/tylermccabe/Documents/NASA/Summer2018/THEMIS/'
 date = '07_14_2008/'
@@ -284,27 +284,6 @@ for i in range(len(min_index1)):
     except:
         ValueError
     ax5.set_xticklabels(unix_to_utc(ax5.get_xticks()))
-    # plt.setp(ax5.get_xticklabels(), visible=False) #Share x-axis
-    
-    # begin, end = get_begin_end_indicies(t6, xmin, xmax)
-    # ax6.semilogy(t6,y6_x,'ro',markersize=0.75,label='Parallel')
-    # ax6.semilogy(t6,y6_y,'go',markersize=0.75,label='Orthogonal')
-    # ax6.semilogy(t6,y6_z,'bo',markersize=0.75,label='Anti-Parallel')
-    # ax6.set_ylabel('Red $ \chi ^{2}$',fontsize=8)
-    # ax6.set_xlabel('Time of Day')
-    # try:
-    #     mins = np.asarray([np.nanmin(y6_x[begin:end]),np.nanmin(y6_y[begin:end]),np.nanmin(y6_z[begin:end])])
-    #     maxs = np.asarray([np.nanmax(y6_x[begin:end]),np.nanmax(y6_y[begin:end]),np.nanmax(y6_z[begin:end])])
-    #     min_y = np.nanmin(mins)
-    #     max_y = np.nanmax(maxs) * 1.1
-    #     ax6.set_ylim(min_y, max_y) 
-    # except:
-    #     ValueError
-    # try:
-    #     ax6.set_xlim(xmin,xmax)
-    # except:
-    #     ValueError
-    # ax6.set_xticklabels(unix_to_utc(ax6.get_xticks()))
     
     fig.suptitle(plot_title)
     plt.setp(ax5.get_xticklabels(), rotation=30, horizontalalignment='right')
