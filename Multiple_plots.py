@@ -16,10 +16,10 @@ plt.rcParams['ytick.right'] = True
 themis = 'THC'
 
 path = '/Users/tylermccabe/Documents/NASA/Summer2018/THEMIS/'
-date = '09_16_2008/'
+date = '08_19_2008/'
 tplot = themis + '.tplot'
 savedir = 'Plots/' + themis + '/'
-plot_title = themis + ': ' + date[:-1]
+plot_title = 'TIFP Data from ' + themis + ' on ' + date[:-1]
 
 file = scipy.io.readsav(path+date+tplot,python_dict=True)
 dq = file['dq']
@@ -37,12 +37,12 @@ def get_index(string_handle):
 			index = i
 	return index
 
-index1 = get_index('fgh_mag')      ## Magnetic Field Mag      (fgh_mag)
-index2 = get_index('fgh_gse')      ## Magnetic Field Vector   (fgh_gse)
-index3 = get_index('peeb_density') ## Electron Density Burst  (peeb_density)
-index4 = get_index('peeb_avgtemp') ## Electron Temp Burst     (peeb_avgtemp)
-index5 = get_index('peib_density') ## Ion Density Burst       (peib_density)
-index6 = get_index('peib_avgtemp') ## Ion Temp Burst          (peib_avgtemp)
+index1 = get_index('fgh_mag')           ## Magnetic Field Mag    
+index2 = get_index('fgh_gse')           ## Magnetic Field Vector   
+index3 = get_index('peib_velocity_gse') ## Ion Velocity GSE     
+index4 = get_index('peeb_avgtemp')      ## Electron Temp Burst     
+index5 = get_index('peib_density')      ## Ion Density Burst       
+index6 = get_index('peib_avgtemp')      ## Ion Temp Burst        
 ## Plot fit params later
 
 ##############
@@ -59,10 +59,12 @@ y2_x = dh[index2].y[0][0] #GSE Coordinates
 y2_y = dh[index2].y[0][1] #GSE Coordinates
 y2_z = dh[index2].y[0][2] #GSE Coordinates
 ##############
-# Electron Density
+# Ion Velocity Vector
 ##############
 t3 = dh[index3].x[0]# - 1215993600
-y3 = dh[index3].y[0]
+y3_x = dh[index3].y[0][0] #GSE Coordinates
+y3_y = dh[index3].y[0][1] #GSE Coordinates
+y3_z = dh[index3].y[0][2] #GSE Coordinates
 
 ##############
 # Electron Temperature
@@ -145,7 +147,7 @@ for i in range(len(min_index1)):
 
     print('Plot ',i+1)
 
-    fig = plt.figure(figsize=(5.5,6.5))
+    fig = plt.figure(figsize=(5.5,7.5))
     ax1 = fig.add_subplot(6,1,1)
     ax2 = fig.add_subplot(6,1,2,sharex=ax1)
     ax3 = fig.add_subplot(6,1,3,sharex=ax1)
@@ -182,10 +184,17 @@ for i in range(len(min_index1)):
     plt.setp(ax2.get_xticklabels(), visible=False) #Share x-axis
 
     begin, end = get_begin_end_indicies(t3, xmin, xmax)
-    ax3.plot(t3,y3,'k',lw=0.5)
-    ax3.set_ylabel('$n_{e}\ (cm^{-3})$')
+    ax3.plot(t3,y3_x,'r',lw=0.5,label='X')
+    ax3.plot(t3,y3_y,'g',lw=0.5,label='Y')
+    ax3.plot(t3,y3_z,'b',lw=0.5, label ='Z')
+    ax3.set_ylabel('$\mathbf{v}_{i}$ (km/s)')
+    ax3.legend(loc='center left', frameon=True,prop={'size': 8})
     ax3.set_xlim(xmin,xmax)
-    ax3.set_ylim(np.nanmin(y3[begin:end])*0.8, np.nanmax(y3[begin:end])*1.1)
+    mins = np.asarray([np.nanmin(y3_x[begin:end]),np.nanmin(y3_y[begin:end]),np.nanmin(y3_z[begin:end])])
+    maxs = np.asarray([np.nanmax(y3_x[begin:end]),np.nanmax(y3_y[begin:end]),np.nanmax(y3_z[begin:end])])
+    min_y = np.nanmin(mins)
+    max_y = np.nanmax(maxs) * 1.1
+    ax3.set_ylim(min_y, max_y) 
     ax3.set_xticklabels(unix_to_utc(ax3.get_xticks()))    
     plt.setp(ax3.get_xticklabels(), visible=False) #Share x-axis
 
@@ -217,7 +226,7 @@ for i in range(len(min_index1)):
     begin, end = get_begin_end_indicies(t6, xmin, xmax)
     ax6.plot(t6,y6,'k',lw=0.5)
     ax6.set_ylabel('$T_{i}$ (eV)')
-    ax6.set_xlabel('Time From Start of Date (s)')
+    ax6.set_xlabel('Time')
     ax6.set_xlim(xmin,xmax)
     ax6.set_ylim(np.nanmin(y6[begin:end])*0.8, np.nanmax(y6[begin:end])*1.1)
     diff = np.nanmax(y6[begin:end]) - np.nanmin(y6[begin:end])
@@ -231,9 +240,11 @@ for i in range(len(min_index1)):
     else:
         pass
     ax6.set_xticklabels(unix_to_utc(ax6.get_xticks()))
+    plt.setp(ax6.get_xticklabels(), rotation=30, horizontalalignment='right')
+
 
     fig.suptitle(plot_title)
-    fig.subplots_adjust(left=0.15, bottom=0.1, right=0.97, top=0.94, wspace=0.2, hspace=0.18) #hspace = 0.38 with labels
+    fig.subplots_adjust(left=0.15, bottom=0.1, right=0.95, top=0.94, wspace=0.2, hspace=0.18) #hspace = 0.38 with labels
     plt.savefig(path + date + savedir + 'figure_%d.png'%(i+1))
     # plt.show() 
     plt.clf()
